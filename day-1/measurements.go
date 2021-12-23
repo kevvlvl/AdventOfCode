@@ -19,8 +19,6 @@ func Day1_measurements() {
 
 	var stringData = bytes.Split(content, []byte{'\n'})
 
-	fmt.Println("File contents length: ", len(stringData))
-
 	inc := 0
 	dec := 0
 
