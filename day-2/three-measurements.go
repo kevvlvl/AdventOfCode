@@ -9,7 +9,7 @@ import (
 
 func Day2ThreeMeasurements() {
 
-	fmt.Println("Day2_three_measurements() Start")
+	fmt.Println("Day2ThreeMeasurements() Start")
 
 	inc := 0
 	prev := 0
@@ -41,5 +41,5 @@ func Day2ThreeMeasurements() {
 		}
 	}
 
-	fmt.Println("Day2_three_measurements() End - Increases = ", inc)
+	fmt.Println("Day2ThreeMeasurements() End - Increases = ", inc)
 }
