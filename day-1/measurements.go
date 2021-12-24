@@ -4,19 +4,20 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"strconv"
 )
 
-func Day1Measurements() {
+func Measurements() {
 
-	fmt.Println("Day1Measurements() Start")
+	fmt.Println("Measurements() Start")
 
 	inc := 0
 
 	var content, err = ioutil.ReadFile("day-1/puzzle-input.txt")
-
 	if err != nil {
 		fmt.Println("  FATAL: - Failed to read file")
+		os.Exit(1)
 	}
 
 	var stringData = bytes.Split(content, []byte{'\n'})
@@ -30,20 +31,20 @@ func Day1Measurements() {
 		}
 	}
 
-	fmt.Println("Day1Measurements() End - Increases = ", inc)
+	fmt.Println("Measurements() End - Increases = ", inc)
 }
 
-func Day1ThreeMeasurements() {
+func ThreeMeasurements() {
 
-	fmt.Println("Day1ThreeMeasurements() Start")
+	fmt.Println("ThreeMeasurements() Start")
 
 	inc := 0
 	prev := 0
 
 	var content, err = ioutil.ReadFile("day-1/puzzle-input.txt")
-
 	if err != nil {
 		fmt.Println("  FATAL: - Failed to read file")
+		os.Exit(1)
 	}
 
 	var strData = bytes.Split(content, []byte{'\n'})
@@ -67,5 +68,5 @@ func Day1ThreeMeasurements() {
 		}
 	}
 
-	fmt.Println("Day1ThreeMeasurements() End - Increases = ", inc)
+	fmt.Println("ThreeMeasurements() End - Increases = ", inc)
 }
