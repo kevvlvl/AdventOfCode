@@ -7,9 +7,11 @@ import (
 	"strconv"
 )
 
-func Day1_measurements() {
+func Day1Measurements() {
 
-	fmt.Println("day1_measurements() Start")
+	fmt.Println("Day1_measurements() Start")
+
+	inc := 0
 
 	var content, err = ioutil.ReadFile("day-1/puzzle-input.txt")
 
@@ -18,10 +20,6 @@ func Day1_measurements() {
 	}
 
 	var stringData = bytes.Split(content, []byte{'\n'})
-
-	inc := 0
-	dec := 0
-
 	for i := 1; i < len(stringData); i++ {
 
 		intCurrent, _ := strconv.Atoi(string(stringData[i]))
@@ -29,10 +27,8 @@ func Day1_measurements() {
 
 		if intCurrent > intPrev {
 			inc++
-		} else {
-			dec++
 		}
 	}
 
-	fmt.Println("day1_measurements() End - Increases = ", inc, ", Decreases = ", dec)
+	fmt.Println("Day1_measurements() End - Increases = ", inc)
 }
