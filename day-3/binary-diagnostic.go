@@ -152,33 +152,32 @@ func getBitsSlice(stringData [][]byte) ([]string, int, int) {
 	return bitsMatrix, fileLength, bitsLength
 }
 
-/**
-Return the common and least common bit for the given index for the list of bits values
+func findRemainingBits(bitsSlice []string, pos int, isCommon bool) string {
 
-1 is returned if the count matches the 0 (exact 50/50 split)
-*/
-func getCommonBit(bitsSlice []string, x int) (byte, byte) {
+	// Find common bit at current index
 
+	var commonBit byte
+	var leastCommonBit byte
 	oneBitCount := 0
 	sliceLength := len(bitsSlice)
+	bitsLength := len(bitsSlice[0])
 
 	for i := 0; i < sliceLength; i++ {
-		if bitsSlice[i][x] == bytesValueOne[0] {
+		if bitsSlice[i][pos] == bytesValueOne[0] {
 			oneBitCount++
 		}
 	}
 
 	if oneBitCount >= (sliceLength - oneBitCount) {
-		return bytesValueOne[0], bytesValueZero[0]
+		commonBit = bytesValueOne[0]
+		leastCommonBit = bytesValueZero[0]
 	} else {
-		return bytesValueZero[0], bytesValueOne[0]
+		commonBit = bytesValueZero[0]
+		leastCommonBit = bytesValueOne[0]
 	}
-}
 
-func findRemainingBits(bitsSlice []string, pos int, isCommon bool) string {
+	// Compile list of matching bits for common bit
 
-	bitsLength := len(bitsSlice[0])
-	commonBit, leastCommonBit := getCommonBit(bitsSlice, pos)
 	var commonList []string
 
 	if isCommon {
