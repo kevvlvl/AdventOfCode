@@ -153,13 +153,6 @@ func getBitsSlice(stringData [][]byte) ([]string, int, int) {
 }
 
 /**
-Find if the bit is set to searchBit at the given (x) position
-*/
-func isBitSet(bits string, x int, searchBit byte) bool {
-	return bits[x] == searchBit
-}
-
-/**
 Return the common and least common bit for the given index for the list of bits values
 
 1 is returned if the count matches the 0 (exact 50/50 split)
