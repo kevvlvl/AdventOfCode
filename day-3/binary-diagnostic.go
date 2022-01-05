@@ -160,7 +160,6 @@ func findRemainingBits(bitsSlice []string, pos int, isCommon bool) string {
 	var leastCommonBit byte
 	oneBitCount := 0
 	sliceLength := len(bitsSlice)
-	bitsLength := len(bitsSlice[0])
 
 	for i := 0; i < sliceLength; i++ {
 		if bitsSlice[i][pos] == bytesValueOne[0] {
@@ -186,7 +185,7 @@ func findRemainingBits(bitsSlice []string, pos int, isCommon bool) string {
 		commonList = compileListMatchingBits(bitsSlice, pos, leastCommonBit)
 	}
 
-	if len(commonList) == 1 && pos <= (bitsLength-1) {
+	if len(commonList) == 1 {
 		return commonList[0]
 	} else {
 		return findRemainingBits(commonList, pos+1, isCommon)
