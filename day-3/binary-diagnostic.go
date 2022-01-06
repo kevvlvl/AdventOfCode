@@ -123,7 +123,7 @@ func getBitsMatrix(stringData [][]byte) ([][]string, int, int) {
 	for i := 0; i < fileLength; i++ {
 
 		lineStr := string(stringData[i])
-		var bitsArray []string
+		bitsArray := make([]string, bitsLength)
 
 		for i, v := range lineStr {
 			bitsArray[i] = string(v)

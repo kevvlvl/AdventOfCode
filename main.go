@@ -24,6 +24,6 @@ func puzzleDay2() {
 }
 
 func puzzleDay3() {
-	//day3.MeasurePowerConsumption()
+	day3.MeasurePowerConsumption()
 	day3.MeasureLifeSupportingRate()
 }
