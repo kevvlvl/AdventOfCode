@@ -4,13 +4,15 @@ import (
 	day1 "AdventOfCode/day-1"
 	day2 "AdventOfCode/day-2"
 	day3 "AdventOfCode/day-3"
+	day4 "AdventOfCode/day-4"
 )
 
 func main() {
 
 	//puzzleDay1()
 	//puzzleDay2()
-	puzzleDay3()
+	//puzzleDay3()
+	puzzleDay4()
 }
 
 func puzzleDay1() {
@@ -26,4 +28,8 @@ func puzzleDay2() {
 func puzzleDay3() {
 	day3.MeasurePowerConsumption()
 	day3.MeasureLifeSupportingRate()
+}
+
+func puzzleDay4() {
+	day4.FindBingoMatrix()
 }
