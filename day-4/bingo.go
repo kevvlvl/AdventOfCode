@@ -2,6 +2,7 @@ package day_4
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"os"
 	"regexp"
@@ -10,9 +11,10 @@ import (
 )
 
 var numbers []int
-var lastNumberCalled int
+
 var bingoMatrices = make([]BingoMatrix, 0)
-var wonBoard BingoMatrix
+var firstBoardWon BingoMatrix
+var firstBoardWonLastNumberCalled int
 
 type BingoMatrix struct {
 	numbers [][]int
@@ -27,25 +29,25 @@ func FindBingoMatrix() {
 	fmt.Println("Matrices loaded: ", bingoMatrices)
 
 	findWinningMatrix()
-	fmt.Println("The first board that won BINGO (horizontal or vertical) = ", wonBoard, " - Last number called = ", lastNumberCalled)
+	fmt.Println("The first board that won BINGO (horizontal or vertical) = ", firstBoardWon, " - Last number called = ", firstBoardWonLastNumberCalled)
 
-	sumOfUncalledNumbers := calculateScore()
+	sumOfUncalledNumbers := calculateScore(firstBoardWon)
 	fmt.Println("The sum of all uncalled numbers = ", sumOfUncalledNumbers)
 
-	puzzleAnswer := sumOfUncalledNumbers * lastNumberCalled
+	puzzleAnswer := sumOfUncalledNumbers * firstBoardWonLastNumberCalled
 	fmt.Println("The Puzzle answer (Final score) = ", puzzleAnswer)
 
 	fmt.Println("FindBingoMatrix() End")
 }
 
-func calculateScore() int {
+func calculateScore(board BingoMatrix) int {
 
 	var sumOfUncalledNumbers int
-	for i := 0; i < len(wonBoard.numbers); i++ {
-		for j := 0; j < len(wonBoard.numbers[i]); j++ {
+	for i := 0; i < len(board.numbers); i++ {
+		for j := 0; j < len(board.numbers[i]); j++ {
 
-			if wonBoard.found[i][j] == 0 {
-				sumOfUncalledNumbers += wonBoard.numbers[i][j]
+			if board.found[i][j] == 0 {
+				sumOfUncalledNumbers += board.numbers[i][j]
 			}
 		}
 	}
@@ -53,29 +55,22 @@ func calculateScore() int {
 	return sumOfUncalledNumbers
 }
 
-func verifyAnyWonBoard() bool {
+func verifyWonBoard() (BingoMatrix, error) {
 
 	for m := 0; m < len(bingoMatrices); m++ {
 
 		for i := 0; i < len(bingoMatrices[m].found); i++ {
 
 			horizontalSum := bingoMatrices[m].found[i][0] + bingoMatrices[m].found[i][1] + bingoMatrices[m].found[i][2] + bingoMatrices[m].found[i][3] + bingoMatrices[m].found[i][4]
-			if horizontalSum == 5 {
-				fmt.Println("Found a winning board!")
-				wonBoard = bingoMatrices[m]
-				return true
-			}
-
 			verticalSum := bingoMatrices[m].found[0][i] + bingoMatrices[m].found[1][i] + bingoMatrices[m].found[2][i] + bingoMatrices[m].found[3][i] + bingoMatrices[m].found[4][i]
-			if verticalSum == 5 {
+
+			if horizontalSum == 5 || verticalSum == 5 {
 				fmt.Println("Found a winning board!")
-				wonBoard = bingoMatrices[m]
-				return true
+				return bingoMatrices[m], nil
 			}
 		}
 	}
-
-	return false
+	return BingoMatrix{}, errors.New("no winning matrix found")
 }
 
 func findWinningMatrix() {
@@ -91,8 +86,11 @@ func findWinningMatrix() {
 					if bingoMatrices[m].numbers[i][j] == v {
 						bingoMatrices[m].found[i][j] = 1
 
-						if verifyAnyWonBoard() {
-							lastNumberCalled = v
+						board, err := verifyWonBoard()
+
+						if err == nil {
+							firstBoardWonLastNumberCalled = v
+							firstBoardWon = board
 							return
 						}
 					}
