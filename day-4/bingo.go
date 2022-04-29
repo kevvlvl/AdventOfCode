@@ -2,7 +2,6 @@ package day_4
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
 	"os"
 	"regexp"
@@ -14,11 +13,13 @@ var numbers []int
 
 var bingoMatrices = make([]BingoMatrix, 0)
 var firstBoardWon BingoMatrix
-var firstBoardWonLastNumberCalled int
+var lastBoardWon BingoMatrix
+var wonBoardLastNumberCalled int
 
 type BingoMatrix struct {
 	numbers [][]int
 	found   [5][5]int
+	won     bool
 }
 
 func FindBingoMatrix() {
@@ -29,15 +30,34 @@ func FindBingoMatrix() {
 	fmt.Println("Matrices loaded: ", bingoMatrices)
 
 	findWinningMatrix()
-	fmt.Println("The first board that won BINGO (horizontal or vertical) = ", firstBoardWon, " - Last number called = ", firstBoardWonLastNumberCalled)
+	fmt.Println("The first board that won BINGO (horizontal or vertical) = ", firstBoardWon, " - Last number called = ", wonBoardLastNumberCalled)
 
 	sumOfUncalledNumbers := calculateScore(firstBoardWon)
 	fmt.Println("The sum of all uncalled numbers = ", sumOfUncalledNumbers)
 
-	puzzleAnswer := sumOfUncalledNumbers * firstBoardWonLastNumberCalled
+	puzzleAnswer := sumOfUncalledNumbers * wonBoardLastNumberCalled
 	fmt.Println("The Puzzle answer (Final score) = ", puzzleAnswer)
 
 	fmt.Println("FindBingoMatrix() End")
+}
+
+func FindLastWinningBingoMatrix() {
+
+	fmt.Println("FindLastWinningBingoMatrix() Start")
+
+	loadData()
+	fmt.Println("Matrices loaded: ", bingoMatrices)
+
+	findLastWinningMatrix()
+	fmt.Println("The last board that won BINGO (horizontal or vertical) = ", lastBoardWon, " - Last number called = ", wonBoardLastNumberCalled)
+
+	sumOfUncalledNumbers := calculateScore(lastBoardWon)
+	fmt.Println("The sum of all uncalled numbers = ", sumOfUncalledNumbers)
+
+	puzzleAnswer := sumOfUncalledNumbers * wonBoardLastNumberCalled
+	fmt.Println("The Puzzle answer (Final score) = ", puzzleAnswer)
+
+	fmt.Println("FindLastWinningBingoMatrix() End")
 }
 
 func calculateScore(board BingoMatrix) int {
@@ -55,22 +75,20 @@ func calculateScore(board BingoMatrix) int {
 	return sumOfUncalledNumbers
 }
 
-func verifyWonBoard() (BingoMatrix, error) {
+func verifyBoard(board BingoMatrix) bool {
 
-	for m := 0; m < len(bingoMatrices); m++ {
+	for i := 0; i < len(board.found); i++ {
 
-		for i := 0; i < len(bingoMatrices[m].found); i++ {
+		horizontalSum := board.found[i][0] + board.found[i][1] + board.found[i][2] + board.found[i][3] + board.found[i][4]
+		verticalSum := board.found[0][i] + board.found[1][i] + board.found[2][i] + board.found[3][i] + board.found[4][i]
 
-			horizontalSum := bingoMatrices[m].found[i][0] + bingoMatrices[m].found[i][1] + bingoMatrices[m].found[i][2] + bingoMatrices[m].found[i][3] + bingoMatrices[m].found[i][4]
-			verticalSum := bingoMatrices[m].found[0][i] + bingoMatrices[m].found[1][i] + bingoMatrices[m].found[2][i] + bingoMatrices[m].found[3][i] + bingoMatrices[m].found[4][i]
-
-			if horizontalSum == 5 || verticalSum == 5 {
-				fmt.Println("Found a winning board!")
-				return bingoMatrices[m], nil
-			}
+		if horizontalSum == 5 || verticalSum == 5 {
+			fmt.Println("This board ", board, " it's a bingo!")
+			return true
 		}
 	}
-	return BingoMatrix{}, errors.New("no winning matrix found")
+
+	return false
 }
 
 func findWinningMatrix() {
@@ -84,14 +102,51 @@ func findWinningMatrix() {
 			for i := 0; i < len(bingoMatrices[m].numbers); i++ {
 				for j := 0; j < len(bingoMatrices[m].numbers[i]); j++ {
 					if bingoMatrices[m].numbers[i][j] == v {
+
+						fmt.Println("Number", v, " found!")
 						bingoMatrices[m].found[i][j] = 1
 
-						board, err := verifyWonBoard()
+						won := verifyBoard(bingoMatrices[m])
+						if won {
 
-						if err == nil {
-							firstBoardWonLastNumberCalled = v
-							firstBoardWon = board
+							bingoMatrices[m].won = true
+							firstBoardWon = bingoMatrices[m]
+							wonBoardLastNumberCalled = v
 							return
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+func findLastWinningMatrix() {
+	for _, v := range numbers {
+
+		fmt.Println("Current Number ", v)
+
+		for m := 0; m < len(bingoMatrices); m++ {
+
+			for i := 0; i < len(bingoMatrices[m].numbers); i++ {
+
+				if bingoMatrices[m].won {
+					break
+				}
+
+				for j := 0; j < len(bingoMatrices[m].numbers[i]); j++ {
+					if bingoMatrices[m].numbers[i][j] == v {
+
+						fmt.Println("Number", v, " found!")
+						bingoMatrices[m].found[i][j] = 1
+
+						won := verifyBoard(bingoMatrices[m])
+
+						if won {
+							bingoMatrices[m].won = true
+							lastBoardWon = bingoMatrices[m]
+							wonBoardLastNumberCalled = v
+							break
 						}
 					}
 				}
@@ -122,6 +177,7 @@ func loadData() {
 	numbers = stringArrayToInt(scanner.Text(), ",")
 	fmt.Println(numbers)
 
+	bingoMatrices = make([]BingoMatrix, 0)
 	// next lines will be loaded into matrices
 
 	for {

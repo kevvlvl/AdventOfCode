@@ -31,5 +31,6 @@ func puzzleDay3() {
 }
 
 func puzzleDay4() {
-	day4.FindBingoMatrix()
+	//day4.FindBingoMatrix()
+	day4.FindLastWinningBingoMatrix()
 }
