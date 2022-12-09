@@ -98,7 +98,13 @@ func findIntersects() {
 			showLineDirection(v2)
 
 			// TODO: calculate intersects
+			//  X intersection:
+			//    where (v1.x1 >= v2.x1 && v1.x2 <= v2.x2) or (v2.x1 >= v1.x1 && v2.x2 <= v1.x2)
+			//  Y intersection:
+			//    where (v1.y1 >= v2.y1 && v1.y2 <= v2.y2) or (v2.y1 >= v1.y1 && v2.y2 <= v1.y2)
+
 			// TODO increment intersects counter
+			//  keep in memory lines intersecting each other to not duplicate counts
 		}
 	}
 }
