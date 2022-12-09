@@ -236,7 +236,7 @@ func stringArrayToInt(stringNumbers string, separator string) []int {
 }
 
 func stringArrayToIntWithWhitespace(stringNumbers string) []int {
-	stringNumbersArr := regexp.MustCompile("[\\s]+").Split(strings.TrimSpace(stringNumbers), -1)
+	stringNumbersArr := regexp.MustCompile(`\s+`).Split(strings.TrimSpace(stringNumbers), -1)
 	intArray := make([]int, len(stringNumbersArr))
 
 	for i, v := range stringNumbersArr {
