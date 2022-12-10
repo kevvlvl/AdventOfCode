@@ -94,26 +94,33 @@ func findIntersects() {
 				continue
 			}
 
-			showLineDirection(v1)
-			showLineDirection(v2)
-
-			// TODO: calculate intersects
-			//  X intersection:
-			//    where (v1.x1 >= v2.x1 && v1.x2 <= v2.x2) or (v2.x1 >= v1.x1 && v2.x2 <= v1.x2)
-			//  Y intersection:
-			//    where (v1.y1 >= v2.y1 && v1.y2 <= v2.y2) or (v2.y1 >= v1.y1 && v2.y2 <= v1.y2)
-
-			// TODO increment intersects counter
-			//  keep in memory lines intersecting each other to not duplicate counts
+			findIntersec(v1, v2)
 		}
 	}
 }
 
-func showLineDirection(line Line) {
+func findIntersec(l1 Line, l2 Line) {
 
-	if line.x1 == line.x2 {
-		fmt.Println("is Vertical line: ", line)
-	} else {
-		fmt.Println("is Horizontal line: ", line)
+	intersectX := 0
+	intersectY := 0
+	line1IsHorizontal := l1.x1 == l1.x2
+	line2IsHorizontal := l2.x1 == l2.x2
+
+	if line1IsHorizontal && line2IsHorizontal {
+		fmt.Println("both lines horizontal. verify if overlap")
+
+	} else if !line1IsHorizontal && !line2IsHorizontal {
+		fmt.Println("both lines vertical. verify if overlap")
+
+	} else if line1IsHorizontal && !line2IsHorizontal {
+		fmt.Println("line1 horizontal and line2 vertical")
+
+	} else if !line1IsHorizontal && line2IsHorizontal {
+		fmt.Println("line1 vertical and line2 horizontal")
 	}
+
+	// TODO increment intersects counter
+	//  keep in memory lines intersecting each other to not duplicate counts
+
+	fmt.Println("Lines cross at (x,y) = ", intersectX, intersectY)
 }
