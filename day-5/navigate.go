@@ -9,6 +9,7 @@ import (
 )
 
 var lines = make([]Line, 0)
+var linesIntersects = make([]LineIntersect, 0)
 
 type Line struct {
 	x1         int
@@ -16,6 +17,11 @@ type Line struct {
 	x2         int
 	y2         int
 	intersects int
+}
+
+type LineIntersect struct {
+	l1 Line
+	l2 Line
 }
 
 func FindOverlaps() {
@@ -89,38 +95,42 @@ func findIntersects() {
 			// line = (x1,y1)->(x2,y2)
 			// intersects happen where two lines whose values x1 and x2 are within range or y1 and y2 are within range
 
-			// skip if current lines refer to each-other (same line!)
+			// skip if current lines refer to each-other
 			if i == j {
 				continue
 			}
 
-			findIntersec(v1, v2)
+			calc(v1, v2)
 		}
 	}
 }
 
-func findIntersec(l1 Line, l2 Line) {
+func calc(l1 Line, l2 Line) {
 
-	intersectX := 0
-	intersectY := 0
-	line1IsHorizontal := l1.x1 == l1.x2
-	line2IsHorizontal := l2.x1 == l2.x2
+	if l1.x1 == l1.x2 && l2.x1 == l2.x2 && l1.x1 == l2.x1 {
+		fmt.Println("both lines vertical on the same X. verify if Y overlaps")
 
-	if line1IsHorizontal && line2IsHorizontal {
-		fmt.Println("both lines horizontal. verify if overlap")
+	} else if l1.y1 == l1.y2 && l2.y1 == l2.y2 && l1.y1 == l2.y1 {
+		fmt.Println("both lines horizontal on the same Y. verify if X overlaps")
 
-	} else if !line1IsHorizontal && !line2IsHorizontal {
-		fmt.Println("both lines vertical. verify if overlap")
+		//linesIntersects = append(linesIntersects, LineIntersect{l1: l1, l2: l2})
+	} else {
+		fmt.Println("Verify if both lines intersect")
 
-	} else if line1IsHorizontal && !line2IsHorizontal {
-		fmt.Println("line1 horizontal and line2 vertical")
+		//let Line 1 = (l1x1,l1y1) -> (l1x2,l1y2) and Line 2 = (l2x1,l2y1) -> (l2x2,l2y2)
 
-	} else if !line1IsHorizontal && line2IsHorizontal {
-		fmt.Println("line1 vertical and line2 horizontal")
+		denominator := (l1.x1-l1.x2)*(l2.y1-l2.y2) - (l1.y1-l1.y2)*(l2.x1-l2.x2)
+
+		if denominator != 0 {
+
+			xPoint := ((l1.x1*l1.y2-l1.y1*l1.x2)*(l2.x1-l2.x2) - (l1.x1-l1.x2)*(l2.x1*l2.y2-l2.y1*l2.x2)) / denominator
+			yPoint := ((l1.x1*l1.y2-l1.y1*l1.x2)*(l2.y1-l2.y2) - (l1.y1-l1.y2)*(l2.x1*l2.y2-l2.y1*l2.x2)) / denominator
+
+			fmt.Println("X,Y = ", xPoint, ",", yPoint)
+		}
+
+		//intersect := false
+		//intersectX := 0
+		//intersectY := 0
 	}
-
-	// TODO increment intersects counter
-	//  keep in memory lines intersecting each other to not duplicate counts
-
-	fmt.Println("Lines cross at (x,y) = ", intersectX, intersectY)
 }
