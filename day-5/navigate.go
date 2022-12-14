@@ -93,6 +93,8 @@ func readFile() {
 
 func loadMap() {
 
+	fmt.Println("loadMap() Start loading coordinates into a Map")
+
 	for _, v := range lines {
 
 		if v.isHorizontal() {
@@ -114,6 +116,8 @@ func loadMap() {
 			}
 		}
 	}
+
+	fmt.Println("loadMap() End")
 }
 
 func countIntersectsGreaterThan(minIntersects int) {
