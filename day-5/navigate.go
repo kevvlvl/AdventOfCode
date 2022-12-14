@@ -18,6 +18,20 @@ type Line struct {
 	y2 int
 }
 
+/*
+Horizontal line = same Y value
+*/
+func (line Line) isHorizontal() bool {
+	return line.y1 == line.y2
+}
+
+/*
+Vertical line = same X value
+*/
+func (line Line) isVertical() bool {
+	return line.x1 == line.x2
+}
+
 type LineIntersect struct {
 	l1 Line
 	l2 Line
@@ -29,6 +43,8 @@ func FindOverlaps() {
 
 	loadData()
 	findIntersects()
+
+	fmt.Println("Number of intersects of two lines: ", len(linesIntersects))
 
 	fmt.Println("FindLeastOverlap() End")
 }
@@ -105,76 +121,125 @@ func findIntersects() {
 
 func calc(l1 Line, l2 Line) {
 
-	if linesAreHorizontalParallel(l1, l2) || linesAreVerticalParallel(l1, l2) {
+	// let Line 1 = (l1x1,l1y1) -> (l1x2,l1y2) and Line 2 = (l2x1,l2y1) -> (l2x2,l2y2)
 
-		parallelLinesOverlap(l1, l2)
+	if l1.isHorizontal() {
 
-	} else {
-		fmt.Println("Verify if both lines intersect")
-
-		// let Line 1 = (l1x1,l1y1) -> (l1x2,l1y2) and Line 2 = (l2x1,l2y1) -> (l2x2,l2y2)
-
-		//intersect := false
-		//intersectX := 0
-		//intersectY := 0
+		if l2.isHorizontal() {
+			parallelHorizontalLinesOverlap(l1, l2)
+		} else if l2.isVertical() {
+			perpendicularLinesOverlap(l1, l2)
+		}
+	} else if l1.isVertical() {
+		if l2.isHorizontal() {
+			perpendicularLinesOverlap(l2, l1)
+		} else if l2.isVertical() {
+			parallelVerticalLinesOverlap(l1, l2)
+		}
 	}
 }
 
-func parallelLinesOverlap(l1 Line, l2 Line) {
+func parallelHorizontalLinesOverlap(l1 Line, l2 Line) {
 
-	var line1Y1OverlapLine2 = false
-	var line1Y2OverlapLine2 = false
-	var line2Y1OverlapLine1 = false
-	var line2Y2OverlapLine1 = false
-	var line1X1OverlapLine2 = false
-	var line1X2OverlapLine2 = false
-	var line2X1OverlapLine1 = false
-	var line2X2OverlapLine1 = false
+	line1X1OverlapLine2 := (l1.x1 >= l2.x1 && l1.x1 <= l2.x2) || (l1.x1 >= l2.x2 && l1.x1 <= l2.x1)
+	line1X2OverlapLine2 := (l1.x2 >= l2.x1 && l1.x2 <= l2.x2) || (l1.x2 >= l2.x2 && l1.x2 <= l2.x1)
 
-	// if vertical line (same x), else if horizontal line (same y)
-	if linesAreVerticalParallel(l1, l2) {
-		line1Y1OverlapLine2 = (l1.y1 >= l2.y1 && l1.y1 <= l2.y2) || (l1.y1 >= l2.y2 && l1.y1 <= l2.y1)
-		line1Y2OverlapLine2 = (l1.y2 >= l2.y1 && l1.y2 <= l2.y2) || (l1.y2 >= l2.y2 && l1.y2 <= l2.y1)
+	line2X1OverlapLine1 := (l2.x1 >= l1.x1 && l2.x1 <= l1.x2) || (l2.x1 >= l1.x2 && l2.x1 <= l1.x1)
+	line2X2OverlapLine1 := (l2.x2 >= l1.x1 && l2.x2 <= l1.x2) || (l2.x2 >= l1.x2 && l2.x2 <= l1.x1)
 
-		line2Y1OverlapLine1 = (l2.y1 >= l1.y1 && l2.y1 <= l1.y2) || (l2.y1 >= l1.y2 && l2.y1 <= l1.y1)
-		line2Y2OverlapLine1 = (l2.y2 >= l1.y1 && l2.y2 <= l1.y2) || (l2.y2 >= l1.y2 && l2.y2 <= l1.y1)
-	} else if linesAreHorizontalParallel(l1, l2) {
-		line1X1OverlapLine2 = (l1.x1 >= l2.x1 && l1.x1 <= l2.x2) || (l1.x1 >= l2.x2 && l1.x1 <= l2.x1)
-		line1X2OverlapLine2 = (l1.x2 >= l2.x1 && l1.x2 <= l2.x2) || (l1.x2 >= l2.x2 && l1.x2 <= l2.x1)
-
-		line2X1OverlapLine1 = (l2.x1 >= l1.x1 && l2.x1 <= l1.x2) || (l2.x1 >= l1.x2 && l2.x1 <= l1.x1)
-		line2X2OverlapLine1 = (l2.x2 >= l1.x1 && l2.x2 <= l1.x2) || (l2.x2 >= l1.x2 && l2.x2 <= l1.x1)
-	}
-
-	overlap := line1Y1OverlapLine2 ||
-		line1Y2OverlapLine2 ||
-		line1X1OverlapLine2 ||
+	overlap := line1X1OverlapLine2 ||
 		line1X2OverlapLine2 ||
-		line2Y1OverlapLine1 ||
-		line2Y2OverlapLine1 ||
 		line2X1OverlapLine1 ||
 		line2X2OverlapLine1
 
-	fmt.Println("Line 1 (", l1, ") Line2 (", l2, ") overlap? ", overlap)
+	if overlap {
+		addIntersectToList(l1, l2)
+	}
+}
+
+func parallelVerticalLinesOverlap(l1 Line, l2 Line) {
+
+	line1Y1OverlapLine2 := (l1.y1 >= l2.y1 && l1.y1 <= l2.y2) || (l1.y1 >= l2.y2 && l1.y1 <= l2.y1)
+	line1Y2OverlapLine2 := (l1.y2 >= l2.y1 && l1.y2 <= l2.y2) || (l1.y2 >= l2.y2 && l1.y2 <= l2.y1)
+
+	line2Y1OverlapLine1 := (l2.y1 >= l1.y1 && l2.y1 <= l1.y2) || (l2.y1 >= l1.y2 && l2.y1 <= l1.y1)
+	line2Y2OverlapLine1 := (l2.y2 >= l1.y1 && l2.y2 <= l1.y2) || (l2.y2 >= l1.y2 && l2.y2 <= l1.y1)
+
+	overlap := line1Y1OverlapLine2 ||
+		line1Y2OverlapLine2 ||
+		line2Y1OverlapLine1 ||
+		line2Y2OverlapLine1
 
 	if overlap {
+		addIntersectToList(l1, l2)
+	}
+}
+
+func perpendicularLinesOverlap(horizontalLine Line, verticalLine Line) {
+
+	verticalLowerBoundary := min(verticalLine.y1, verticalLine.y2)
+	verticalUpperBoundary := max(verticalLine.y1, verticalLine.y2)
+
+	if horizontalLine.x1 <= horizontalLine.x2 {
+
+		for i := horizontalLine.x1; i <= horizontalLine.x2; i++ {
+
+			if i == verticalLine.x1 && horizontalLine.y1 >= verticalLowerBoundary && horizontalLine.y1 <= verticalUpperBoundary {
+				addIntersectToList(horizontalLine, verticalLine)
+				break
+			}
+		}
+	} else {
+
+		for i := horizontalLine.x2; i <= horizontalLine.x1; i++ {
+
+			if i == verticalLine.x1 && horizontalLine.y1 >= verticalLowerBoundary && horizontalLine.y1 <= verticalUpperBoundary {
+				addIntersectToList(horizontalLine, verticalLine)
+				break
+			}
+		}
+	}
+}
+
+/*
+Append the intersect of the two lines only if it ha snot already been saved.
+*/
+func addIntersectToList(l1 Line, l2 Line) {
+
+	//fmt.Println("Both lines (l1 ", l1, ", l2 ", l2, ") intersect")
+
+	if !isIntersectInList(l1, l2) {
 		linesIntersects = append(linesIntersects, LineIntersect{l1: l1, l2: l2})
 	}
 }
 
-/*
-*
-Both lines are horizontal parallel when they have the same Y value
-*/
-func linesAreHorizontalParallel(l1 Line, l2 Line) bool {
+func isIntersectInList(l1 Line, l2 Line) bool {
 
-	return l1.y1 == l1.y2 && l2.y1 == l2.y2 && l1.y1 == l2.y1
+	var found = false
+
+	for i := range linesIntersects {
+		if (linesIntersects[i].l1 == l1 && linesIntersects[i].l2 == l2) ||
+			linesIntersects[i].l1 == l2 && linesIntersects[i].l2 == l1 {
+			found = true
+			break
+		}
+	}
+
+	return found
 }
 
-/*
-*
-Both lines are vertical parallel when they have the same X value
-*/
-func linesAreVerticalParallel(l1 Line, l2 Line) bool {
-	return l1.x1 == l1.x2 && l2.x1 == l2.x2 && l1.x1 == l2.x1
+func min(a int, b int) int {
+	if a < b {
+		return a
+	}
+
+	return b
+}
+
+func max(a int, b int) int {
+	if a > b {
+		return a
+	}
+
+	return b
 }
