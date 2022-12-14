@@ -70,33 +70,30 @@ func loadData() {
 	for scanner.Scan() {
 
 		line := scanner.Text()
-		findStraightLines(line, r)
+		strToLine(line, r)
 	}
 
+	fmt.Println("Parsed ", len(lines), " of strings as Line structs")
 	fmt.Println("loadData() End")
 }
 
-func findStraightLines(line string, r *regexp.Regexp) {
+func strToLine(line string, r *regexp.Regexp) {
 
 	if r.MatchString(line) {
 
 		res := r.FindAllStringSubmatch(line, 1)
 
-		fmt.Println("Line = ", line, " res = ", res)
-
 		// Line = (x1  res[0][1], y1 res[0][2]) -> (x2 res[0][3], y2 res[0][4])
-		// Straight lines where x1 = x2 or y1 = y2
-		if (res[0][1] == res[0][3]) || (res[0][2] == res[0][4]) {
 
-			var line Line
-			line.x1, _ = strconv.Atoi(res[0][1])
-			line.y1, _ = strconv.Atoi(res[0][2])
-			line.x2, _ = strconv.Atoi(res[0][3])
-			line.y2, _ = strconv.Atoi(res[0][4])
+		var line Line
+		line.x1, _ = strconv.Atoi(res[0][1])
+		line.y1, _ = strconv.Atoi(res[0][2])
+		line.x2, _ = strconv.Atoi(res[0][3])
+		line.y2, _ = strconv.Atoi(res[0][4])
 
-			lines = append(lines, line)
-			fmt.Println("   Straight line found: ", line)
-		}
+		lines = append(lines, line)
+	} else {
+		fmt.Println("ERROR - Line does not match regex: ", line)
 	}
 }
 
@@ -141,37 +138,43 @@ func calc(l1 Line, l2 Line) {
 
 func parallelHorizontalLinesOverlap(l1 Line, l2 Line) {
 
-	line1X1OverlapLine2 := (l1.x1 >= l2.x1 && l1.x1 <= l2.x2) || (l1.x1 >= l2.x2 && l1.x1 <= l2.x1)
-	line1X2OverlapLine2 := (l1.x2 >= l2.x1 && l1.x2 <= l2.x2) || (l1.x2 >= l2.x2 && l1.x2 <= l2.x1)
+	if l1.y1 == l2.y1 {
 
-	line2X1OverlapLine1 := (l2.x1 >= l1.x1 && l2.x1 <= l1.x2) || (l2.x1 >= l1.x2 && l2.x1 <= l1.x1)
-	line2X2OverlapLine1 := (l2.x2 >= l1.x1 && l2.x2 <= l1.x2) || (l2.x2 >= l1.x2 && l2.x2 <= l1.x1)
+		line1X1OverlapLine2 := (l1.x1 >= l2.x1 && l1.x1 <= l2.x2) || (l1.x1 >= l2.x2 && l1.x1 <= l2.x1)
+		line1X2OverlapLine2 := (l1.x2 >= l2.x1 && l1.x2 <= l2.x2) || (l1.x2 >= l2.x2 && l1.x2 <= l2.x1)
 
-	overlap := line1X1OverlapLine2 ||
-		line1X2OverlapLine2 ||
-		line2X1OverlapLine1 ||
-		line2X2OverlapLine1
+		line2X1OverlapLine1 := (l2.x1 >= l1.x1 && l2.x1 <= l1.x2) || (l2.x1 >= l1.x2 && l2.x1 <= l1.x1)
+		line2X2OverlapLine1 := (l2.x2 >= l1.x1 && l2.x2 <= l1.x2) || (l2.x2 >= l1.x2 && l2.x2 <= l1.x1)
 
-	if overlap {
-		addIntersectToList(l1, l2)
+		overlap := line1X1OverlapLine2 ||
+			line1X2OverlapLine2 ||
+			line2X1OverlapLine1 ||
+			line2X2OverlapLine1
+
+		if overlap {
+			addIntersectToList(l1, l2)
+		}
 	}
 }
 
 func parallelVerticalLinesOverlap(l1 Line, l2 Line) {
 
-	line1Y1OverlapLine2 := (l1.y1 >= l2.y1 && l1.y1 <= l2.y2) || (l1.y1 >= l2.y2 && l1.y1 <= l2.y1)
-	line1Y2OverlapLine2 := (l1.y2 >= l2.y1 && l1.y2 <= l2.y2) || (l1.y2 >= l2.y2 && l1.y2 <= l2.y1)
+	if l1.x1 == l2.x1 {
 
-	line2Y1OverlapLine1 := (l2.y1 >= l1.y1 && l2.y1 <= l1.y2) || (l2.y1 >= l1.y2 && l2.y1 <= l1.y1)
-	line2Y2OverlapLine1 := (l2.y2 >= l1.y1 && l2.y2 <= l1.y2) || (l2.y2 >= l1.y2 && l2.y2 <= l1.y1)
+		line1Y1OverlapLine2 := (l1.y1 >= l2.y1 && l1.y1 <= l2.y2) || (l1.y1 >= l2.y2 && l1.y1 <= l2.y1)
+		line1Y2OverlapLine2 := (l1.y2 >= l2.y1 && l1.y2 <= l2.y2) || (l1.y2 >= l2.y2 && l1.y2 <= l2.y1)
 
-	overlap := line1Y1OverlapLine2 ||
-		line1Y2OverlapLine2 ||
-		line2Y1OverlapLine1 ||
-		line2Y2OverlapLine1
+		line2Y1OverlapLine1 := (l2.y1 >= l1.y1 && l2.y1 <= l1.y2) || (l2.y1 >= l1.y2 && l2.y1 <= l1.y1)
+		line2Y2OverlapLine1 := (l2.y2 >= l1.y1 && l2.y2 <= l1.y2) || (l2.y2 >= l1.y2 && l2.y2 <= l1.y1)
 
-	if overlap {
-		addIntersectToList(l1, l2)
+		overlap := line1Y1OverlapLine2 ||
+			line1Y2OverlapLine2 ||
+			line2Y1OverlapLine1 ||
+			line2Y2OverlapLine1
+
+		if overlap {
+			addIntersectToList(l1, l2)
+		}
 	}
 }
 
