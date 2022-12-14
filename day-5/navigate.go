@@ -99,26 +99,20 @@ func strToLine(line string, r *regexp.Regexp) {
 
 func findIntersects() {
 
-	for i, v1 := range lines {
-
-		for j, v2 := range lines {
-
-			// line = (x1,y1)->(x2,y2)
-			// intersects happen where two lines whose values x1 and x2 are within range or y1 and y2 are within range
+	for _, l1 := range lines {
+		for _, l2 := range lines {
 
 			// skip if current lines refer to each-other
-			if i == j {
-				continue
+			if l1 != l2 {
+				calc(l1, l2)
 			}
-
-			calc(v1, v2)
 		}
 	}
 }
 
-func calc(l1 Line, l2 Line) {
+func calc(l1, l2 Line) {
 
-	// let Line 1 = (l1x1,l1y1) -> (l1x2,l1y2) and Line 2 = (l2x1,l2y1) -> (l2x2,l2y2)
+	// Line 1 = (l1x1,l1y1) -> (l1x2,l1y2) and Line 2 = (l2x1,l2y1) -> (l2x2,l2y2)
 
 	if l1.isHorizontal() {
 
@@ -136,15 +130,21 @@ func calc(l1 Line, l2 Line) {
 	}
 }
 
-func parallelHorizontalLinesOverlap(l1 Line, l2 Line) {
+func parallelHorizontalLinesOverlap(l1, l2 Line) {
 
 	if l1.y1 == l2.y1 {
 
-		line1X1OverlapLine2 := (l1.x1 >= l2.x1 && l1.x1 <= l2.x2) || (l1.x1 >= l2.x2 && l1.x1 <= l2.x1)
-		line1X2OverlapLine2 := (l1.x2 >= l2.x1 && l1.x2 <= l2.x2) || (l1.x2 >= l2.x2 && l1.x2 <= l2.x1)
+		lower := min(l2.x1, l2.x2)
+		upper := max(l2.x1, l2.x2)
 
-		line2X1OverlapLine1 := (l2.x1 >= l1.x1 && l2.x1 <= l1.x2) || (l2.x1 >= l1.x2 && l2.x1 <= l1.x1)
-		line2X2OverlapLine1 := (l2.x2 >= l1.x1 && l2.x2 <= l1.x2) || (l2.x2 >= l1.x2 && l2.x2 <= l1.x1)
+		line1X1OverlapLine2 := coordinateWithinBoundary(l1.x1, lower, upper)
+		line1X2OverlapLine2 := coordinateWithinBoundary(l1.x2, lower, upper)
+
+		lower = min(l1.x1, l1.x2)
+		upper = max(l1.x1, l1.x2)
+
+		line2X1OverlapLine1 := coordinateWithinBoundary(l2.x1, lower, upper)
+		line2X2OverlapLine1 := coordinateWithinBoundary(l2.x2, lower, upper)
 
 		overlap := line1X1OverlapLine2 ||
 			line1X2OverlapLine2 ||
@@ -157,15 +157,21 @@ func parallelHorizontalLinesOverlap(l1 Line, l2 Line) {
 	}
 }
 
-func parallelVerticalLinesOverlap(l1 Line, l2 Line) {
+func parallelVerticalLinesOverlap(l1, l2 Line) {
 
 	if l1.x1 == l2.x1 {
 
-		line1Y1OverlapLine2 := (l1.y1 >= l2.y1 && l1.y1 <= l2.y2) || (l1.y1 >= l2.y2 && l1.y1 <= l2.y1)
-		line1Y2OverlapLine2 := (l1.y2 >= l2.y1 && l1.y2 <= l2.y2) || (l1.y2 >= l2.y2 && l1.y2 <= l2.y1)
+		lower := min(l2.y1, l2.y2)
+		upper := max(l2.y1, l2.y2)
 
-		line2Y1OverlapLine1 := (l2.y1 >= l1.y1 && l2.y1 <= l1.y2) || (l2.y1 >= l1.y2 && l2.y1 <= l1.y1)
-		line2Y2OverlapLine1 := (l2.y2 >= l1.y1 && l2.y2 <= l1.y2) || (l2.y2 >= l1.y2 && l2.y2 <= l1.y1)
+		line1Y1OverlapLine2 := coordinateWithinBoundary(l1.y1, lower, upper)
+		line1Y2OverlapLine2 := coordinateWithinBoundary(l1.y2, lower, upper)
+
+		lower = min(l1.y1, l1.y2)
+		upper = max(l1.y1, l1.y2)
+
+		line2Y1OverlapLine1 := coordinateWithinBoundary(l2.y1, lower, upper)
+		line2Y2OverlapLine1 := coordinateWithinBoundary(l2.y2, lower, upper)
 
 		overlap := line1Y1OverlapLine2 ||
 			line1Y2OverlapLine2 ||
@@ -178,36 +184,31 @@ func parallelVerticalLinesOverlap(l1 Line, l2 Line) {
 	}
 }
 
-func perpendicularLinesOverlap(horizontalLine Line, verticalLine Line) {
+func perpendicularLinesOverlap(horizontalLine, verticalLine Line) {
 
 	verticalLowerBoundary := min(verticalLine.y1, verticalLine.y2)
 	verticalUpperBoundary := max(verticalLine.y1, verticalLine.y2)
 
-	if horizontalLine.x1 <= horizontalLine.x2 {
+	xStartLoc := min(horizontalLine.x1, horizontalLine.x2)
+	xEndLoc := max(horizontalLine.x2, horizontalLine.x2)
 
-		for i := horizontalLine.x1; i <= horizontalLine.x2; i++ {
+	for i := xStartLoc; i <= xEndLoc; i++ {
 
-			if i == verticalLine.x1 && horizontalLine.y1 >= verticalLowerBoundary && horizontalLine.y1 <= verticalUpperBoundary {
-				addIntersectToList(horizontalLine, verticalLine)
-				break
-			}
-		}
-	} else {
-
-		for i := horizontalLine.x2; i <= horizontalLine.x1; i++ {
-
-			if i == verticalLine.x1 && horizontalLine.y1 >= verticalLowerBoundary && horizontalLine.y1 <= verticalUpperBoundary {
-				addIntersectToList(horizontalLine, verticalLine)
-				break
-			}
+		if i == verticalLine.x1 && horizontalLine.y1 >= verticalLowerBoundary && horizontalLine.y1 <= verticalUpperBoundary {
+			addIntersectToList(horizontalLine, verticalLine)
+			break
 		}
 	}
+}
+
+func coordinateWithinBoundary(ref, lower, upper int) bool {
+	return ref >= lower && ref <= upper
 }
 
 /*
 Append the intersect of the two lines only if it ha snot already been saved.
 */
-func addIntersectToList(l1 Line, l2 Line) {
+func addIntersectToList(l1, l2 Line) {
 
 	//fmt.Println("Both lines (l1 ", l1, ", l2 ", l2, ") intersect")
 
@@ -216,7 +217,7 @@ func addIntersectToList(l1 Line, l2 Line) {
 	}
 }
 
-func isIntersectInList(l1 Line, l2 Line) bool {
+func isIntersectInList(l1, l2 Line) bool {
 
 	var found = false
 
@@ -231,7 +232,7 @@ func isIntersectInList(l1 Line, l2 Line) bool {
 	return found
 }
 
-func min(a int, b int) int {
+func min(a, b int) int {
 	if a < b {
 		return a
 	}
@@ -239,7 +240,7 @@ func min(a int, b int) int {
 	return b
 }
 
-func max(a int, b int) int {
+func max(a, b int) int {
 	if a > b {
 		return a
 	}
