@@ -39,14 +39,29 @@ func FindOverlaps() {
 
 	fmt.Println("FindOverlaps() Start")
 
-	readFile()
+	readFile(false)
 	loadMap()
 	countIntersectsGreaterThan(2)
 
 	fmt.Println("FindOverlaps() End")
 }
 
-func readFile() {
+func FindOverLapsWithDiagnonalLines() {
+
+	// empty data already in-memory from previous execution
+	lines = make([]Line, 0)
+	m = make(map[Coordinate]int)
+
+	fmt.Println("FindOverLapsWithDiagnonalLines() Start")
+
+	readFile(true)
+	loadMap()
+
+	fmt.Println("FindOverLapsWithDiagnonalLines() End")
+
+}
+
+func readFile(loadDiagonal bool) {
 
 	fmt.Println("readFile() Start")
 
@@ -80,6 +95,9 @@ func readFile() {
 
 			if x1 == x2 || y1 == y2 {
 				lines = append(lines, Line{p1: Coordinate{x1, y1}, p2: Coordinate{x2, y2}})
+			} else if loadDiagonal {
+
+				// TODO: load diagonal 45 degrees lines where value of slope (y2 - y1 / x2 - x1) = 1 or -1
 			}
 
 		} else {

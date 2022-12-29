@@ -70,4 +70,5 @@ DAY 5
 `)
 
 	day5.FindOverlaps()
+	day5.FindOverLapsWithDiagnonalLines()
 }
